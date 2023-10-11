@@ -1,0 +1,46 @@
+version: '3.6'
+
+services:
+  grafana:
+    image: grafana/grafana
+    # grafana user to satisfy file permissions
+    # user: "1003"
+    container_name: grafana-ch
+    volumes:
+      - grafanadata:/var/lib/grafana
+    ports:
+      - "3000:3000"
+
+  ch:
+    image: clickhouse/clickhouse-server
+    container_name: clickhouse
+    restart: always
+    volumes:
+    - clickhouse-data:/var/lib/clickhouse/
+    ports:
+    - '8123:8123'
+    - '9000:9000'
+    # 
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 262144
+        hard: 262144
+    # This capabilities prevents Docker from complaining about lack of those
+    cap_add:
+      - SYS_NICE
+      - NET_ADMIN
+      - IPC_LOCK
+
+volumes:
+  grafanadata:
+  
+  clickhouse-data:
+    # driver: local
+    # driver_opts:
+    #   o: bind
+    #   type: none
+      # device: ./containers/data-clickhouse-1
+  
